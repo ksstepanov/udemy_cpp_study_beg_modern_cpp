@@ -61,8 +61,23 @@ class Checking: public Account
     float get_min_balance(void) const;
     friend std::ostream & operator <<(std::ostream &out, Checking &a);
 };
-
 std::ostream & operator <<(std::ostream &out, Checking &a);
+
+class Checking2: private Account
+{
+    const float m_min_balance;
+    protected:
+    virtual void _print(std::ostream& o) const;
+    public:
+    // using Account::Account; // this can be used to automatically generate constructor that calls base class constructor
+    // with the same arguments
+    Checking2(const std::string name, float initial_balance, float min_balance);
+    void withdraw(float val);
+    float get_min_balance(void) const;
+    friend std::ostream & operator <<(std::ostream &out, Checking2 &a);
+};
+
+std::ostream & operator <<(std::ostream &out, Checking2 &a);
 
 void test_account(void);
 

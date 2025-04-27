@@ -26,6 +26,8 @@
 #include "lambda_expressions.h"
 #include "stl_array.h"
 #include "stl_set_map_hash.h"
+#include "concurency_simple.h"
+#include "std_17_introduction.h"
 
 namespace mymath {
     int my_add(int a, int b);
@@ -245,5 +247,7 @@ int main(void) {
     //test_my_stack();
     //test_lambda();
     //test_stl_array();
-    test_stl_set_map_hash();
+    //test_stl_set_map_hash();
+    //test_concurrency_simple();
+    test_std17();
 }

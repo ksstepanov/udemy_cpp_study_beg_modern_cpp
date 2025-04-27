@@ -10,6 +10,11 @@
 #include <filesystem>
 #include <fstream>
 
+#include <list>
+#include <deque>
+#include <vector>
+
+
 void test_stl_set(void)
 {
     // by default sorts in acsending order:
@@ -211,6 +216,7 @@ void test_algorithms_1(void) {
 }
 
 void container_changes_182_plus(void) {
+    std::cout << "Test emplace with vector" <<std::endl;
     std::vector<integer_move::Integer> v_int;
     v_int.push_back(5);
     v_int.emplace_back(10);
@@ -219,6 +225,7 @@ void container_changes_182_plus(void) {
 
 
     // Vector shrink:
+    std::cout << "Test shrink with vector" <<std::endl;
     std::vector<int> v_large;
     for (int i = 0; i < 100; i++)
         v_large.emplace_back(i);
@@ -252,6 +259,80 @@ void read_file_to_std_vector(void) {
     std::cout << buf.data() <<std::endl;
 }
 
+void test_std_erase(void)
+{
+    std::cout << "Test erase with list, vector, deque" <<std::endl;
+    std::vector<int> v1{1, 2,3 , 4, 5, 2};
+    std::deque<float>d1{1.0f, 2.0f};
+    std::list<int>l1{2, 3, 4, 5};
+
+    std::erase(v1, 2);
+    std::erase(d1, 2);
+    std::erase(l1, 2);
+    auto printer = [](auto &&x){std::cout << x <<", ";};
+    std::for_each(v1.begin(), v1.end(), printer);
+    std::cout <<std::endl;
+
+    std::for_each(d1.begin(), d1.end(), printer);
+    std::cout <<std::endl;
+
+    std::for_each(l1.begin(), l1.end(), printer);
+    std::cout <<std::endl;
+
+}
+
+void test_emplace_with_std_set(void) {
+    std::cout << "Test emplace with set" <<std::endl;
+    std::set<std::string> sset;
+    sset.emplace("New_str");
+    sset.emplace("New_str2");
+    sset.emplace_hint(sset.begin(), "New_str3"); // if you know that new element should be
+    // inserted close to some iterator position, this is faster than just emplace
+
+    auto printer = [](auto &&x){std::cout << x <<", ";};
+    std::for_each(sset.begin(), sset.end(), printer);
+    std::cout <<std::endl;
+
+    //check that element exists in the container:
+    auto it = sset.find("New_str");
+    if (it != sset.end()) {
+        std::cout << "found element with set.find" << std::endl;
+    }
+
+    bool found = sset.contains("New_str");
+    if (found) {
+        std::cout << "found element with std::contains" << std::endl;
+    }
+
+    // Change value of existing element: - this is not possible, because it disturb the order of the tree
+    /*
+    auto it = sset.find("New_str");
+    if (it != sset.end()) {
+        auto &actual_string = *it;
+        actual_string[0] = 'C';
+    }
+    */
+    auto it1 = sset.find("New_str");
+    if (it1 != sset.end()) {
+        auto actual_string = *it1; // create a copy. If type is copybale
+        actual_string[0] = 'O';
+        actual_string[1] = 'l';
+        actual_string[2] = 'd';
+        sset.erase(it1);
+        sset.insert(actual_string);
+    }
+    std::for_each(sset.begin(), sset.end(), printer);
+    std::cout <<std::endl;
+
+    // Change value : c++17 way:
+    auto change_node = sset.extract("New_str2");
+    change_node.value()[0] = 'O';
+    change_node.value()[1] = 'l';
+    change_node.value()[2] = 'd';
+    sset.insert(std::move(change_node)); // Note: auto change_node is not copiable
+    std::for_each(sset.begin(), sset.end(), printer);
+    std::cout <<std::endl;
+}
 
 void test_stl_set_map_hash(void)
 {
@@ -262,4 +343,6 @@ void test_stl_set_map_hash(void)
     //test_hash_with_employee();
     //test_algorithms_1();
     container_changes_182_plus();
+    test_std_erase();
+    test_emplace_with_std_set();
 }
