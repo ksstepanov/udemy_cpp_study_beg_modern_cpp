@@ -4,6 +4,9 @@
 #include <string>
 #include <map>
 #include "integer.h"
+#include <cstring>
+#include <optional>
+#include <variant>
 
 void test_initialization(void) {
     auto i{1};
@@ -124,6 +127,70 @@ void print_(const T &val) {
     std::cout << 
 }*/
 
+const char *err_code_to_str(int err_code) {
+    switch(err_code) {
+        case 0:
+            return "Err 0";
+        case 1:
+            return "Err 1";
+        default:
+            return "";
+
+    }
+}
+
+std::optional<const char *> err_code_to_str_op(int err_code) {
+    switch(err_code) {
+        case 0:
+            return "Err 0";
+        case 1:
+            return "Err 1";
+        default:
+            return std::nullopt;
+
+    }
+}
+void test_std_optional(void) {
+    std::optional<int> opt_val{5};
+    //auto opt_val = std::make_optional(5);
+    if (opt_val) {
+        std::cout << *opt_val << std::endl;
+    }
+    // without optional
+    auto str = err_code_to_str(1);
+    if (strlen(str) != 0)
+        std::cout <<str <<std::endl;
+    else
+        std::cout <<"Unknown" <<std::endl;
+
+    // with optional:
+    auto str1 = err_code_to_str_op(10);
+    if (str1)
+        std::cout <<*str1 <<std::endl;
+    else
+        std::cout <<"Unknown" <<std::endl;
+    // same but shorter:
+    std::cout <<str1.value_or("Unknown") <<std::endl;
+}
+
+// =================================================================
+void test_std_variant(void) {
+    try {
+        std::variant<std::string, float, integer_move::Integer> v{integer_move::Integer(10)}; // initialize member int (index 1)
+        std::get<integer_move::Integer>(v) = 100;
+        auto val = std::get<float>(v);
+        auto val2 = std::get<1>(v);
+        auto activa_index = v.index();
+
+        auto p = std::get_if<float>(&v); // returns nullptr if inactive member is requested
+        if (p != nullptr)
+            std::cout <<*p <<std::endl;
+    } catch (std::exception &ex){
+        std::cout <<"Exception with std::variant" <<std::endl;
+    }
+
+}
+
 void test_std17(void)
 {
     test_initialization();
@@ -132,8 +199,9 @@ void test_std17(void)
     test_class_template_argument_deduction();
     //test_folding();
     int a=1;
-    std::cout<<(a++)*(++a)<<", " << sizeof(void) <<std::endl;
-
+    std::cout<<(a++)*(++a)<<", " << sizeof(void) <<std::endl; // 3
+    test_std_optional();
     //int x=(a++)++;
     //std::cout<<x<<std::endl;
+    test_std_variant();
 }
